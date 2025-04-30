@@ -1,184 +1,198 @@
-# 🌿 Projeto Umidade - Node.js + Express + PostgreSQL + Prisma
+# 🌿 Projeto Umidade - Node.js + Express + PostgreSQL + Prisma + Arduino
 
-Este projeto é uma API que recebe dados de **umidade** e salva no banco de dados **PostgreSQL** usando **Prisma ORM**.
-
----
-
-## 🚀 Tecnologias usadas
-
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Prisma ORM](https://www.prisma.io/)
+**Uma API REST para registrar e visualizar dados de umidade, integrada com Arduino via Python.**
 
 ---
 
-## 📦 Instalação
+## 🚀 Tecnologias
+
+- **Back-end:** Node.js, Express
+- **ORM:** Prisma
+- **Banco de Dados:** PostgreSQL
+- **Script Serial:** Python (pyserial, requests)
+- **Serial Device:** Arduino
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+umidade-api/
+├── prisma/                # Configurações e migrações do Prisma
+│   ├── migrations/
+│   └── schema.prisma
+├── src/                   # Código-fonte da API
+│   ├── controllers/       # Lógica de negócio
+│   ├── routes/            # Definição de endpoints
+│   ├── services/          # Comunicação com o banco e utilitários
+│   └── app.js             # Configuração do Express
+├── leitura/               # Script Python para leitura serial
+│   └── leitura.py
+├── .env                   # Variáveis de ambiente
+├── .gitignore
+├── package.json
+├── server.js              # Ponto de entrada da aplicação
+└── README.md              # Documentação
+```
+
+---
+
+## 💻 Instalação e Configuração
 
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-projeto.git
-cd seu-projeto
+git clone https://github.com/seu-usuario/umidade-api.git
+cd umidade-api
 ```
 
-### 2. Instale as dependências
+### 2. Instale dependências
 
-```bash
-npm install
-```
+- **Node.js:**
+  ```bash
+  npm install
+  ```  
+- **Python (opcional, para Arduino):**
+  ```bash
+  pip install pyserial requests
+  ```
 
----
+### 3. Variáveis de ambiente
 
-## ⚙️ Configuração do Banco de Dados
-
-Certifique-se de que seu servidor PostgreSQL esteja **ativo**.
-
-- Banco de dados: `postgres`
-- Porta: `5433` (ou ajuste conforme sua instalação)
-- Usuário: `postgres`
-- Senha: `sua_senha`
-
-### 3. Configure o arquivo `.env`
-
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+Crie um arquivo `.env` na raiz:
 
 ```env
-DATABASE_URL="postgresql://postgres:SENHA@localhost:5433/postgres"
+DATABASE_URL="postgresql://postgres:senha@127.0.0.1:5433/postgres"
+PORT=3000
 ```
 
-- Substitua **SENHA** pela sua senha do banco.
+- **DATABASE_URL:** string de conexão PostgreSQL
+- **PORT:** porta onde a API irá rodar (padrão 3000)
 
 ---
 
-## 🔥 Configurar o Prisma
+## ⚙️ Banco de Dados e Prisma
 
-### 4. Gerar o Prisma Client
-
-```bash
-npx prisma generate
-```
-
-### 5. Criar as migrações
-
-```bash
-npx prisma migrate dev --name criar_tabela_umidade
-```
-
-Se ocorrer erro de "drift" (diferença entre o banco e as migrações), execute:
-
-```bash
-npx prisma migrate reset
-```
-
-Isso irá limpar o banco e aplicar as migrações novamente.
+1. **Gerar cliente Prisma**
+   ```bash
+   npx prisma generate
+   ```
+2. **Criar/atualizar migrações**
+   ```bash
+   npx prisma migrate dev --name init_umidade
+   ```
+3. **(Opcional) Resetar o banco em caso de drift**
+   ```bash
+   npx prisma migrate reset
+   ```
+4. **Abrir Prisma Studio**
+   ```bash
+   npx prisma studio
+   ```
 
 ---
 
-## 🚀 Rodando o Projeto
+## 🚀 Executando a API
 
-### 6. Inicie o servidor
+- **Modo padrão:**
+  ```bash
+  node server.js
+  ```
 
-```bash
-node server.js
-```
+- **Modo desenvolvimento (com nodemon):**
+  ```bash
+  npm run dev
+  ```
 
-O servidor será iniciado em:
-
-```
-http://localhost:3000
-```
+Acesse em `http://localhost:3000`.
 
 ---
 
-## 📡 Endpoints
+## 📡 Endpoints Disponíveis
 
 ### POST `/umidade`
 
-Recebe dados de umidade e salva no banco.
+Registrar um novo dado de umidade.
 
-- Método: `POST`
-- URL: `http://localhost:3000/umidade`
-- Headers: `Content-Type: application/json`
-- Body (JSON):
+- **URL:** `/umidade`
+- **Método:** `POST`
+- **Headers:** `Content-Type: application/json`
+- **Body:**
+  ```json
+  {
+    "umidade": 65
+  }
+  ```
+- **Resposta 201:**
+  ```json
+  {
+    "mensagem": "Dado salvo com sucesso",
+    "dado": { "id": 1, "umidade": 65, "dataHora": "2025-04-30T12:34:56.789Z" }
+  }
+  ```
+- **Resposta 400 (dado inválido):**
+  ```json
+  { "erro": "Dado inválido" }
+  ```
 
-```json
-{
-  "umidade": 65
-}
-```
-
-Resposta esperada:
-
-```json
-{
-  "mensagem": "Dado recebido com sucesso"
-}
-```
-
-Se enviar um dado inválido (por exemplo, texto), a API responde:
-
-```json
-{
-  "erro": "Dado inválido"
-}
-```
 
 ---
 
-## 🛠️ Prisma Studio
+## 🧪 Integração com Arduino
 
-Visualize e edite seus dados no banco com uma interface web:
+Para enviar dados de umidade do Arduino para a API, utilize o script Python em `leitura/leitura.py`.
 
-```bash
-npx prisma studio
-```
-
-Isso abrirá automaticamente no navegador.
+- **Dependências Python:** `pyserial`, `requests`
+- **Fluxo:** conecta na porta serial, lê valores, envia via `POST /umidade`
+- **Execução:**
+  ```bash
+  python leitura/leitura.py
+  ```
+- **Atenção:** ajuste a porta (ex: `COM4` ou `/dev/ttyUSB0`) e certifique-se de que a API está em execução.
 
 ---
 
 ## 📋 Scripts úteis
 
-| Comando | Descrição |
-|:--------|:----------|
-| `npm run dev` | Inicia o servidor com **nodemon** |
-| `npx prisma generate` | Gera o Prisma Client |
-| `npx prisma migrate dev` | Aplica migrações no banco |
-| `npx prisma studio` | Abre o Prisma Studio para gerenciar o banco |
+| Comando          | Descrição                                     |
+|:-----------------|:----------------------------------------------|
+| `npm run dev`    | Inicia API com nodemon                        |
+| `npm start`      | Inicia API padrão (`node server.js`)          |
+| `npm run py`     | Executa leitura serial Python (`leitura.py`)  |
+| `npx prisma studio` | Abre o Prisma Studio                       |
 
 ---
 
-## ✅ Checklist para rodar o projeto
+## ✅ Checklist
 
-- [x] PostgreSQL instalado e rodando
+- [x] PostgreSQL instalado e rodando na porta configurada
 - [x] `.env` configurado corretamente
-- [x] Banco de dados acessível (`localhost:5433`)
-- [x] Prisma Client gerado (`npx prisma generate`)
-- [x] Migração criada (`npx prisma migrate dev --name criar_tabela_umidade`)
-- [x] Servidor Node rodando (`npm run dev` ou `node server.js`)
+- [x] Prisma Client gerado e migrações aplicadas
+- [x] API rodando sem erros em `http://localhost:3000`
+- [x] Script Python de leitura pronto e conectando ao Arduino
 
 ---
 
-## 📚 Aprendizados
+## 📚 Aprendizados e Melhori‍as Futuras
 
-- Conexão entre **Node.js** e **PostgreSQL**.
-- Criação de **API REST** usando **Express**.
-- Utilização do **Prisma ORM** para modelagem e manipulação de banco de dados.
-- Utilização do **Prisma Studio** para gerenciamento visual de dados.
-
----
-
-## ✨ Melhorias Futuras
-
-- Adicionar autenticação de usuários.
-- Criar dashboard para visualizar a evolução da umidade.
-- Enviar alertas por e-mail/SMS baseado em limites críticos.
+- **Aprendizados:**
+  - Conexão Node.js ↔ PostgreSQL via Prisma
+  - Boas práticas REST com Express
+  - Automação de leitura serial via Python
+- **Melhorias Futura:**
+  - Autenticação JWT nas rotas
+  - Dashboard web para visualização de histórico de umidade
+  - Alertas/Notificações quando a umidade ultrapassar limites críticos
 
 ---
 
 ## 🧑‍💻 Desenvolvido por
 
-Renan Ming 🚀
+**Renan Ming** 🚀
+
+[Meu GitHub](https://github.com/seu-usuario)
 
 ---
+
+*Feel free to contribute!*
+
