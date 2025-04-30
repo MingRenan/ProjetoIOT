@@ -1,2 +1,22 @@
-# ProjetoIOT
-Projeto com Arduino que usa um sensor de umidade do solo para monitorar a irrigação. Quando o solo está seco, o relé ativa a bomba de água; quando úmido, a bomba é desligada. Ideal para automatizar regas em hortas e jardins pequenos de forma simples e eficiente.
+# Projeto Umidade com Node.js, Express, PostgreSQL e Prisma
+
+Este projeto é uma API simples para receber dados de **umidade** via HTTP e salvar no banco de dados **PostgreSQL** usando o **ORM Prisma**.
+
+---
+
+## 🚀 Tecnologias usadas
+
+- Node.js
+- Express
+- PostgreSQL
+- Prisma ORM
+
+---
+
+## 📦 Instalação e configuração
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/MingRenan/ProjetoIOT.git
+cd seu-projeto
