@@ -1,0 +1,14 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:123@127.0.0.1:5433/postgres"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Umidade {
+  id        Int      @id @default(autoincrement())
+  umidade   Float
+  dataHora  DateTime @default(now())
+}

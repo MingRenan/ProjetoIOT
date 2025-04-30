@@ -1,0 +1,23 @@
+{
+  "name": "projetopy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./sever.js",
+    "py":"python ./leitura.py",
+    "prisma": "npx prisma studio" 
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pg": "^8.15.6",
+    "prisma": "^6.7.0",
+    "sequelize": "^6.37.7"
+  }
+}
