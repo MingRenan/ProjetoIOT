@@ -1,8 +1,3 @@
-Perfeito!  
-Aqui está o **README.md** para você simplesmente copiar e colar:
-
----
-
 # 🌿 Projeto Umidade - Node.js + Express + PostgreSQL + Prisma
 
 Este projeto é uma API que recebe dados de **umidade** e salva no banco de dados **PostgreSQL** usando **Prisma ORM**.
