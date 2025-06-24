@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Irrigação</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #e6f2ff;
+    }
+    h1 {
+      color: #2e7d32;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+<a>
+  <h2>🌡️ Leituras Recentes</h2>
+<div id="leituras">
+  <em>Carregando...</em>
+</div>
+
+<script>
+  async function atualizarLeituras() {
+    try {
+      const res = await fetch('/ultimos-dados');
+      const dados = await res.json();
+      const container = document.getElementById('leituras');
+
+      if (!Array.isArray(dados) || dados.length === 0) {
+        container.innerHTML = "<p>Nenhum dado disponível.</p>";
+        return;
+      }
+
+      container.innerHTML = dados.map(dado =>
+        `<p><strong>${new Date(dado.createdAt).toLocaleTimeString()}</strong>: ${dado.umidade}%</p>`
+      ).join('');
+    } catch (e) {
+      console.error("Erro ao buscar leituras:", e);
+    }
+  }
+
+  setInterval(atualizarLeituras, 2000); // Atualiza a cada 2 segundos
+  atualizarLeituras(); // Chama na primeira vez
+</script>
+
+</a>
+
+
+
+  <h1>🌿 Painel de Controle de Irrigação</h1>
+
+  <button onclick="enviar('ligar1')">💧 Ligar Zona 1</button>
+  <button onclick="enviar('desligar1')">🛑 Desligar Zona 1</button><br/>
+
+  <button onclick="enviar('ligar2')">💧 Ligar Zona 2</button>
+  <button onclick="enviar('desligar2')">🛑 Desligar Zona 2</button><br/>
+
+  <button onclick="enviar('auto')">🔁 Modo Automático</button>
+
+  <script>
+    async function enviar(comando) {
+      try {
+        const res = await fetch('/comando', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comando })
+        });
+        const json = await res.json();
+        alert(json.mensagem);
+      } catch (e) {
+        alert('Erro ao enviar comando!');
+      }
+    }
+  </script>
+</body>
+</html>
