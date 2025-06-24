@@ -1,14 +1,16 @@
-datasource db {
-  provider = "postgresql"
-  url      = "postgresql://postgres:123@127.0.0.1:5433/postgres"
-}
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Você define isso no .env
+}
+
 model Umidade {
   id        Int      @id @default(autoincrement())
-  umidade   Float
-  dataHora  DateTime @default(now())
+  umidade   Int
+  criadoEm  DateTime @default(now())
 }
